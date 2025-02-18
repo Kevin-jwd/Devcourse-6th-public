@@ -65,3 +65,17 @@ app.post("/youtuber", function (req, res) {
         }님, Youtube 채널 개설을 축하드립니다!`,
     });
 });
+
+// DELETE
+app.delete("/youtubers/:id", function (req, res) {
+    let { id } = req.params;
+    id = parseInt(id);
+    const youtuber = db.get(id);
+
+    res.json({
+        message: `${
+            youtuber.channelTitle
+        }님, 다시 만날 날을 기약하겠습니다!`,
+    });
+    db.delete(id);
+});
