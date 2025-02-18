@@ -57,7 +57,7 @@ app.get("/youtubers", function (req, res) {
 
 // POST
 app.use(express.json());
-app.post("/youtubers", function (req, res) {
+app.post("/youtuber", function (req, res) {
     db.set(id++, req.body);
     res.json({
         message: `${
