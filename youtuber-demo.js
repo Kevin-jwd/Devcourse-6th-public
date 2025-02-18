@@ -48,7 +48,11 @@ app.get("/youtubers/:id", function (req, res) {
 
 // GET
 app.get("/youtubers", function (req, res) {
-    res.json(db)
+    var jsonObject = {};
+    db.forEach(function (youtuber, key) {
+        jsonObject[key] = youtuber;
+    });
+    res.json(jsonObject);
 });
 
 // POST
@@ -56,6 +60,8 @@ app.use(express.json());
 app.post("/youtubers", function (req, res) {
     db.set(id++, req.body);
     res.json({
-        message: `${db.get(id-1).channelTitle}님, Youtube 채널 개설을 축하드립니다!`,
+        message: `${
+            db.get(id - 1).channelTitle
+        }님, Youtube 채널 개설을 축하드립니다!`,
     });
 });
