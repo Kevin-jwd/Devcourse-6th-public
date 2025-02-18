@@ -32,7 +32,7 @@ db.set(id++, youtuber2);
 db.set(id++, youtuber3);
 
 // GET
-app.get("/youtuber/:id", function (req, res) {
+app.get("/youtubers/:id", function (req, res) {
     let { id } = req.params;
     id = parseInt(id);
     const youtuber = db.get(id);
@@ -46,9 +46,14 @@ app.get("/youtuber/:id", function (req, res) {
     }
 });
 
+// GET
+app.get("/youtubers", function (req, res) {
+    res.json(db)
+});
+
 // POST
 app.use(express.json());
-app.post("/youtuber", function (req, res) {
+app.post("/youtubers", function (req, res) {
     db.set(id++, req.body);
     res.json({
         message: `${db.get(id-1).channelTitle}님, Youtube 채널 개설을 축하드립니다!`,
