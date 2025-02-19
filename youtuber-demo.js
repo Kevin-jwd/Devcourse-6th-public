@@ -97,3 +97,25 @@ app.delete("/youtubers", function (req, res) {
         message: message,
     });
 });
+
+// PUT
+app.put("/youtubers/:id", function (req, res) {
+    let { id } = req.params;
+    id = parseInt(id);
+    const youtuber = db.get(id);
+
+    var message = "";
+
+    if (youtuber == undefined) {
+        message = "수정할 유튜버가 존재하지 않습니다.";
+    } else {
+        const previous_channelTitle = youtuber.channelTitle;
+        const modified_channelTitle = req.body.channelTitle;
+
+        youtuber.channelTitle = modified_channelTitle;
+
+        message = `채널명 ${previous_channelTitle}에서 ${modified_channelTitle}으로 성공적으로 변경되었습니다.`;
+    }
+
+    res.json(message);
+});
