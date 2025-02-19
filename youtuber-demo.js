@@ -64,12 +64,19 @@ app.get("/youtubers", function (req, res) {
 // POST
 app.use(express.json());
 app.post("/youtuber", function (req, res) {
-    db.set(id++, req.body);
-    res.json({
-        message: `${
-            db.get(id - 1).channelTitle
-        }님, Youtube 채널 개설을 축하드립니다!`,
-    });
+    const channelTitle = req.body.channelTitle;
+    if(channelTitle){
+        db.set(id++, req.body);
+        res.json({
+            message: `${
+                db.get(id - 1).channelTitle
+            }님, Youtube 채널 개설을 축하드립니다!`,
+        });
+    } else {
+        res.status(400).json({
+            message: "400 ERROR! 잘못된 요청입니다.",
+        });
+    }
 });
 
 // DELETE
