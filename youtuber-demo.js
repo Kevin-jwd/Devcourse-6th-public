@@ -38,8 +38,8 @@ app.get("/youtubers/:id", function (req, res) {
     const youtuber = db.get(id);
 
     if (youtuber == undefined) {
-        res.json({
-            message: "존재하지 않는 유튜버입니다.",
+        res.status(404).json({
+            message: "404 ERROR! 존재하지 않는 유튜버입니다.",
         });
     } else {
         res.json(youtuber);
@@ -49,10 +49,16 @@ app.get("/youtubers/:id", function (req, res) {
 // GET
 app.get("/youtubers", function (req, res) {
     var jsonObject = {};
-    db.forEach(function (youtuber, key) {
-        jsonObject[key] = youtuber;
-    });
-    res.json(jsonObject);
+    if (db.size !== 0) {
+        db.forEach(function (youtuber, key) {
+            jsonObject[key] = youtuber;
+        });
+        res.json(jsonObject);
+    } else {
+        res.status(404).json({
+            message: "404 ERROR! 조회할 유튜버가 없습니다.",
+        });
+    }
 });
 
 // POST
@@ -73,8 +79,8 @@ app.delete("/youtubers/:id", function (req, res) {
     const youtuber = db.get(id);
 
     if (youtuber == undefined) {
-        res.json({
-            message: `존재하지 않는 유튜버입니다.`,
+        res.status(404).json({
+            message: "404 ERROR! 존재하지 않는 유튜버입니다.",
         });
     } else {
         res.json({
@@ -89,13 +95,14 @@ app.delete("/youtubers", function (req, res) {
     var message = "";
     if (db.size >= 1) {
         db.clear();
-        message = "전체 유튜버가 삭제되었습니다.";
+        res.json({
+            message: "전체 유튜버가 삭제되었습니다.",
+        });
     } else {
-        message = "삭제할 유튜버가 존재하지 않습니다.";
+        res.status(404).json({
+            message: "404 ERROR! 삭제할 유튜버가 없습니다.",
+        });
     }
-    res.json({
-        message: message,
-    });
 });
 
 // PUT
@@ -107,15 +114,16 @@ app.put("/youtubers/:id", function (req, res) {
     var message = "";
 
     if (youtuber == undefined) {
-        message = "수정할 유튜버가 존재하지 않습니다.";
+        res.status(404).json({
+            message: "404 ERROR! 존재하지 않는 유튜버입니다.",
+        });
     } else {
         const previous_channelTitle = youtuber.channelTitle;
         const modified_channelTitle = req.body.channelTitle;
 
         youtuber.channelTitle = modified_channelTitle;
-
-        message = `채널명 ${previous_channelTitle}에서 ${modified_channelTitle}으로 성공적으로 변경되었습니다.`;
+        res.json(
+            `채널명 ${previous_channelTitle}에서 ${modified_channelTitle}으로 성공적으로 변경되었습니다.`
+        );
     }
-
-    res.json(message);
 });
