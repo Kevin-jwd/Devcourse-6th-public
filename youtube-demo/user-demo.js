@@ -27,15 +27,16 @@ app.post("/login", function (req, res) {
 
 // POST /register
 app.post("/register", function (req, res) {
-    db.set(id++, req.body);
-    let user_id = db.get(id - 1).name;
-    if (req.body == {}) {
-        res.status(201).json({
-            message: `${user_id}님의 회원가입을 축하드립니다!`,
+    // 빈 객체 확인
+    if (Object.keys(req.body).length === 0) {
+        res.status(400).json({
+            message: "입력 값을 다시 한 번 확인해주세요.",
         });
     } else {
-        res.status(400).json({
-            message: "400 ERROR! 존재하지 않는 사용자입니다. ",
+        db.set(id++, req.body);
+        let user_id = db.get(id - 1).name;
+        res.status(201).json({
+            message: `${user_id}님의 회원가입을 축하드립니다!`,
         });
     }
 });
