@@ -31,9 +31,18 @@ app.get("/users/:id", function (req, res) {
 
 // POST /login
 app.post("/login", function (req, res) {
-    let user_id = db.get(id);
-    res.status(201).json({
-        message: `${user_id}님 환영합니다.`,
+    const { user_id, user_pw } = req.body;
+    db.forEach(function (user) {
+        if (user.user_id === user_id) {
+            console.log("일치하는 ID 확인");
+            if (user.user_pw === user_pw) {
+                console.log("일치하는 PW 확인");
+            } else {
+                console.log("PW 불일치");
+            }
+        } else {
+            console.log("일치하는 ID 없음");
+        }
     });
 });
 
