@@ -32,18 +32,18 @@ app.get("/users/:id", function (req, res) {
 // POST /login
 app.post("/login", function (req, res) {
     const { user_id, user_pw } = req.body;
-    db.forEach(function (user) {
-        if (user.user_id === user_id) {
-            console.log("일치하는 ID 확인");
-            if (user.user_pw === user_pw) {
-                console.log("일치하는 PW 확인");
-            } else {
-                console.log("PW 불일치");
-            }
+    const loginUser = db.find((user) => user.user_id === user_id);
+
+    if (loginUser) {
+        console.log("일치하는 ID 확인");
+        if (loginUser.user_pw === user_pw) {
+            console.log("일치하는 PW 확인");
         } else {
-            console.log("일치하는 ID 없음");
+            console.log("PW 불일치");
         }
-    });
+    } else {
+        console.log("일치하는 ID 없음");
+    }
 });
 
 // POST /register
