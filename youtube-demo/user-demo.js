@@ -15,6 +15,18 @@ app.use(express.json());
 // GET /users/:id
 app.get("/users/:id", function (req, res) {
     const id = parseInt(req.params.id);
+    const user = db.get(id);
+    // id가 db에 존재하는지 확인
+    if (user == undefined) {
+        res.status(404).json({
+            message: "존재하지 않는 사용자입니다.",
+        });
+    } else {
+        res.status(201).json({
+            user_id: user.user_id,
+            name: user.name,
+        });
+    }
 });
 
 // POST /login
