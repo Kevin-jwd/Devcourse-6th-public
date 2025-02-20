@@ -56,8 +56,15 @@ app.post("/register", function (req, res) {
 // DELETE /users/:id
 app.delete("/users/:id", function (req, res) {
     const id = parseInt(req.params.id);
-    let user_id = db.get(id);
-    res.status(201).json({
-        message: `${user_id}님 다시 만날 날을 기약하겠습니다.`,
-    });
+    const user = db.get(id);
+    if (user == undefined) {
+        res.status(404).json({
+            message: "존재하지 않는 사용자입니다.",
+        });
+    } else {
+        const user_id = user.user_id;
+        res.status(200).json({
+            message: `${user_id}님 다시 만날 날을 기약하겠습니다.`,
+        });
+    }
 });
