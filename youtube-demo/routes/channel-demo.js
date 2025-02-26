@@ -1,16 +1,7 @@
-// Server Initialization
 const express = require("express");
-const app = express();
+const router = express.Router();
 
-app.use(express.json());
-
-// Declare Port Number
-const port = 1234;
-
-// Start Server
-app.listen(port, () => {
-    console.log(`Server is listening on port ${port}`);
-});
+router.use(express.json());
 
 // Declare Map object as database
 let db = new Map();
@@ -20,7 +11,8 @@ let id = 1;
 
 // Routes
 // path: "/channels"
-app.route("/channels")
+router
+    .route("/channels")
 
     // 전체 채널 조회 : GET /channels
     .get((req, res) => {
@@ -54,7 +46,8 @@ app.route("/channels")
     });
 
 // path: "/channels/:id"
-app.route("/channels/:id")
+router
+    .route("/channels/:id")
 
     // 개별 채널 조회 : GET /channels/:id
     .get((req, res) => {
@@ -103,3 +96,5 @@ app.route("/channels/:id")
             });
         }
     });
+
+module.exports = router;

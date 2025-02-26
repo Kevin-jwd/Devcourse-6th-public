@@ -1,19 +1,13 @@
 const express = require("express");
-const app = express();
-
-const port = 1313;
+const router = express.Router();
 
 let db = new Map();
 let id = 1;
 
-app.listen(port, function () {
-    console.log(`Server is listening on port ${port}`);
-});
-
-app.use(express.json());
+router.use(express.json());
 
 // GET /users/:id
-app.get("/users/:id", function (req, res) {
+router.get("/users/:id", function (req, res) {
     const id = parseInt(req.params.id);
     const user = db.get(id);
     // id가 db에 존재하는지 확인
@@ -30,11 +24,17 @@ app.get("/users/:id", function (req, res) {
 });
 
 // POST /login
-app.post("/login", function (req, res) {
+router.post("/login", function (req, res) {
     const { user_id, user_pw } = req.body;
-    const loginUser = db.find((user) => user.user_id === user_id);
+    let loginUser = {}
 
-    if (loginUser) {
+    db.forEach(function(user,id) {
+        if(user.user_id === user_id) {
+            loginUser = user
+        }
+    })
+
+    if (isExist(loginUser)) {
         console.log("일치하는 ID 확인");
         if (loginUser.user_pw === user_pw) {
             console.log("일치하는 PW 확인");
@@ -46,8 +46,16 @@ app.post("/login", function (req, res) {
     }
 });
 
+function isExist(obj) {
+    if(Object.keys(obj).length) {
+        return true
+    } else {
+        return false
+    }
+}
+
 // POST /register
-app.post("/register", function (req, res) {
+router.post("/register", function (req, res) {
     // 빈 객체 확인
     if (Object.keys(req.body).length === 0) {
         res.status(400).json({
@@ -62,8 +70,9 @@ app.post("/register", function (req, res) {
     }
 });
 
+
 // DELETE /users/:id
-app.delete("/users/:id", function (req, res) {
+router.delete("/users/:id", function (req, res) {
     const id = parseInt(req.params.id);
     const user = db.get(id);
     if (user == undefined) {
@@ -77,3 +86,5 @@ app.delete("/users/:id", function (req, res) {
         });
     }
 });
+
+module.exports = router
