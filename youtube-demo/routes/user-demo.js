@@ -36,14 +36,19 @@ router.post("/login", function (req, res) {
     });
 
     if (isExist(loginUser)) {
-        console.log("일치하는 ID 확인");
         if (loginUser.userPw === userPw) {
-            console.log("일치하는 PW 확인");
+            res.status(200).json({
+                message: `${loginUser.name}님 성공적으로 로그인 되었습니다.`,
+            });
         } else {
-            console.log("PW 불일치");
+            res.status(400).json({
+                message: "비밀번호가 틀렸습니다.",
+            });
         }
     } else {
-        console.log("일치하는 ID 없음");
+        res.status(404).json({
+            message: "존재하지 않는 ID입니다."
+        })
     }
 });
 
