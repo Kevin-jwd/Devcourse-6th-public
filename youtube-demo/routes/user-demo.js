@@ -78,7 +78,7 @@ router.post("/register", function (req, res) {
 });
 
 // DELETE /users/:id
-router.delete("/users/:id", function (req, res) {
+router.delete("/users/", function (req, res) {
     const { userId } = req.body;
     const user = db.get(userId);
 
