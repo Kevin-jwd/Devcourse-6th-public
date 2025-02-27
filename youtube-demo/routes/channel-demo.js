@@ -12,7 +12,7 @@ let id = 1;
 // Routes
 // path: "/channels"
 router
-    .route("/channels")
+    .route("/")
 
     // 전체 채널 조회 : GET /channels
     .get((req, res) => {
@@ -47,7 +47,7 @@ router
 
 // path: "/channels/:id"
 router
-    .route("/channels/:id")
+    .route("/:id")
 
     // 개별 채널 조회 : GET /channels/:id
     .get((req, res) => {
