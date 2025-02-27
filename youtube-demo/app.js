@@ -11,4 +11,4 @@ const userRouter = require('./routes/user-demo')
 const channelRouter = require('./routes/channel-demo')
 
 app.use("/", userRouter)
-app.use("/", channelRouter)
+app.use("/channels", channelRouter)
