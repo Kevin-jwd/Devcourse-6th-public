@@ -16,33 +16,45 @@ router
 
     // 전체 채널 조회 : GET /channels
     .get((req, res) => {
-        if (db.size) {
-            let jsonObject = {};
-            db.forEach(function (channel, key) {
-                jsonObject[key] = channel;
+        let { userId } = req.body;
+        let jsonObject = {};
+
+        if(userId == undefined) {
+            return res.status(404).json({
+                message: "로그인이 필요한 페이지입니다.",
             });
-            res.status(200).json(jsonObject);
-        } else {
-            res.status(404).json({
+        }
+
+        db.forEach((channel, key) => {
+            if (channel.userId === userId) {
+                jsonObject[key] = channel;
+            }
+        });
+        
+        if (Object.keys(jsonObject).length === 0) {
+            return res.status(404).json({
                 message: "조회할 채널이 존재하지 않습니다.",
             });
         }
+
+        res.status(200).json(jsonObject); 
     })
 
     // 채널 등록 : POST /channels
     .post((req, res) => {
         if (req.body.channelTitle) {
-            db.set(id++, req.body);
-            res.status(201).json({
+            const channel = req.body;
+            db.set(id++, channel);
+            return res.status(201).json({
                 message: `${
                     db.get(id - 1).channelTitle
                 } 채널이 성공적으로 생성되었습니다.`,
             });
-        } else {
-            res.status(400).json({
-                message: "요청 값이 유효하지 않습니다.",
-            });
         }
+
+        res.status(400).json({
+            message: "요청 값이 유효하지 않습니다.",
+        });
     });
 
 // path: "/channels/:id"
