@@ -1,17 +1,15 @@
 const express = require("express");
 const router = express.Router();
 
-let db = new Map();
-let id = 1;
-
 router.use(express.json());
 
-// GET /users
-router.get("/users", function (req, res) {
+let db = new Map();
+
+// 사용자 조회 (GET /users)
+router.get("/users", (req, res) => {
     const { userId } = req.body;
     const user = db.get(userId);
 
-    // id가 db에 존재하는지 확인
     if (user) {
         res.status(201).json({
             userId: user.userId,
@@ -24,8 +22,8 @@ router.get("/users", function (req, res) {
     }
 });
 
-// POST /login
-router.post("/login", function (req, res) {
+// 로그인 (POST /login)
+router.post("/login", (req, res) => {
     const { userId, userPw } = req.body;
     let loginUser = {};
 
@@ -48,27 +46,18 @@ router.post("/login", function (req, res) {
     } else {
         res.status(404).json({
             message: "존재하지 않는 ID입니다."
-        })
+        });
     }
 });
 
-function isExist(obj) {
-    if (Object.keys(obj).length) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-// POST /register
-router.post("/register", function (req, res) {
-    // 빈 객체 확인
+// 회원가입 (POST /register)
+router.post("/register", (req, res) => {
     if (Object.keys(req.body).length === 0) {
         res.status(400).json({
             message: "입력 값을 다시 한 번 확인해주세요.",
         });
     } else {
-        const { userId } = req.body.userId;
+        const { userId } = req.body;
         db.set(userId, req.body);
         let name = db.get(userId).name;
         res.status(201).json({
@@ -77,13 +66,14 @@ router.post("/register", function (req, res) {
     }
 });
 
-// DELETE /users/:id
-router.delete("/users/", function (req, res) {
+// 회원 삭제 (DELETE /users/)
+router.delete("/users/", (req, res) => {
     const { userId } = req.body;
     const user = db.get(userId);
 
     if (user) {
         const name = user.name;
+        db.delete(userId);
         res.status(200).json({
             message: `${name}님 다시 만날 날을 기약하겠습니다.`,
         });
@@ -93,5 +83,14 @@ router.delete("/users/", function (req, res) {
         });
     }
 });
+
+// 존재 여부 확인 함수
+function isExist(obj) {
+    if (Object.keys(obj).length) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 module.exports = router;
