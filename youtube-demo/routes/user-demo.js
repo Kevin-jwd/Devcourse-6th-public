@@ -50,17 +50,14 @@ router.post("/login", (req, res) => {
                     .status(500)
                     .json({ message: "서버 오류가 발생했습니다." });
             }
-            if (results.length != 0) {
-                loginUser = results[0];
-                if (loginUser.password == password) {
-                    return res.status(200).json({
-                        message: `${loginUser.name}님 성공적으로 로그인되었습니다.`,
-                    });
-                } else {
-                    return res.status(400).json({
-                        message: "비밀번호가 틀렸습니다.",
-                    });
-                }
+            if (results.length !== 0 && results[0].password === password) {
+                return res.status(200).json({
+                    message: `${results[0].name}님 성공적으로 로그인되었습니다.`,
+                });
+            } else if (results.length !== 0) {
+                return res.status(400).json({
+                    message: "비밀번호가 틀렸습니다.",
+                });
             } else {
                 return res.status(404).json({
                     message: "존재하지 않는 사용자입니다.",
