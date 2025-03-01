@@ -4,8 +4,6 @@ const router = express.Router();
 
 router.use(express.json());
 
-let db = new Map();
-
 // 데이터베이스와 connection(conn) 생성
 const conn = mysql.createConnection({
     host: "localhost",
@@ -28,9 +26,9 @@ router.get("/users", (req, res) => {
                     .json({ message: "서버 오류가 발생했습니다." });
             }
             if (results.length != 0) {
-                res.status(200).json(results);
+                return res.status(200).json(results);
             } else {
-                res.status(404).json({
+                return res.status(404).json({
                     message: "존재하지 않는 사용자입니다.",
                 });
             }
@@ -55,16 +53,16 @@ router.post("/login", (req, res) => {
             if (results.length != 0) {
                 loginUser = results[0];
                 if (loginUser.password == password) {
-                    res.status(200).json({
+                    return res.status(200).json({
                         message: `${loginUser.name}님 성공적으로 로그인되었습니다.`,
                     });
                 } else {
-                    res.status(400).json({
+                    return res.status(400).json({
                         message: "비밀번호가 틀렸습니다.",
                     });
                 }
             } else {
-                res.status(404).json({
+                return res.status(404).json({
                     message: "존재하지 않는 사용자입니다.",
                 });
             }
@@ -75,7 +73,7 @@ router.post("/login", (req, res) => {
 // 회원가입 (POST /register)
 router.post("/register", (req, res) => {
     if (Object.keys(req.body).length === 0) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "입력 값을 다시 한 번 확인해주세요.",
         });
     } else {
@@ -83,13 +81,13 @@ router.post("/register", (req, res) => {
         conn.query(
             `INSERT INTO users (email, name, password, contact) VALUES (?,?,?,?)`,
             [email, name, password, contact],
-            function (err, results) {
+            function (error, results) {
                 if (error) {
                     return res
                         .status(500)
                         .json({ message: "서버 오류가 발생했습니다." });
                 }
-                res.status(201).json(results);
+                return res.status(201).json(results);
             }
         );
     }
@@ -101,24 +99,24 @@ router.delete("/users/", (req, res) => {
     conn.query(
         `DELETE FROM users WHERE email = ?`,
         [email],
-        function (err, results) {
+        function (error, results) {
             if (error) {
                 return res
                     .status(500)
                     .json({ message: "서버 오류가 발생했습니다." });
             }
-            res.status(200).json(results);
+            return res.status(200).json(results);
         }
     );
 
     if (user) {
         const name = user.name;
         db.delete(userId);
-        res.status(200).json({
+        return res.status(200).json({
             message: `${name}님 다시 만날 날을 기약하겠습니다.`,
         });
     } else {
-        res.status(404).json({
+        return res.status(404).json({
             message: "존재하지 않는 사용자입니다.",
         });
     }
