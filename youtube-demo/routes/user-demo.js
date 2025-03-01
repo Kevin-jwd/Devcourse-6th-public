@@ -17,9 +17,10 @@ const conn = mysql.createConnection({
 // 사용자 조회 (GET /users)
 router.get("/users", (req, res) => {
     const { email } = req.body;
-    console.log(email);
+
     conn.query(
-        `SELECT * FROM users WHERE users.email = ?`, [email],
+        `SELECT * FROM users WHERE users.email = ?`,
+        [email],
         function (error, results) {
             if (results.length != 0) {
                 res.status(200).json(results);
@@ -67,12 +68,14 @@ router.post("/register", (req, res) => {
             message: "입력 값을 다시 한 번 확인해주세요.",
         });
     } else {
-        const { userId } = req.body;
-        db.set(userId, req.body);
-        let name = db.get(userId).name;
-        res.status(201).json({
-            message: `${name}님의 회원가입을 축하드립니다!`,
-        });
+        const { email, name, password, contact } = req.body;
+        conn.query(
+            `INSERT INTO users (email, name, password, contact) VALUES (?,?,?,?)`,
+            [email, name, password, contact],
+            function (err, results) {
+                res.status(201).json(results);
+            }
+        );
     }
 });
 
