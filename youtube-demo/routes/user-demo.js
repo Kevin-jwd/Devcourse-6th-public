@@ -1,25 +1,35 @@
 const express = require("express");
+const mysql = require("mysql2");
 const router = express.Router();
 
 router.use(express.json());
 
 let db = new Map();
 
+// 데이터베이스와 connection(conn) 생성
+const conn = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "root",
+    database: "Youtube",
+});
+
 // 사용자 조회 (GET /users)
 router.get("/users", (req, res) => {
-    const { userId } = req.body;
-    const user = db.get(userId);
-
-    if (user) {
-        res.status(201).json({
-            userId: user.userId,
-            name: user.name,
-        });
-    } else {
-        res.status(404).json({
-            message: "존재하지 않는 사용자입니다.",
-        });
-    }
+    const { email } = req.body;
+    console.log(email);
+    conn.query(
+        `SELECT * FROM users WHERE users.email = ?`, [email],
+        function (error, results) {
+            if (results.length != 0) {
+                res.status(200).json(results);
+            } else {
+                res.status(404).json({
+                    message: "존재하지 않는 사용자입니다.",
+                });
+            }
+        }
+    );
 });
 
 // 로그인 (POST /login)
@@ -45,7 +55,7 @@ router.post("/login", (req, res) => {
         }
     } else {
         res.status(404).json({
-            message: "존재하지 않는 ID입니다."
+            message: "존재하지 않는 ID입니다.",
         });
     }
 });
