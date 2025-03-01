@@ -22,6 +22,11 @@ router.get("/users", (req, res) => {
         `SELECT * FROM users WHERE users.email = ?`,
         [email],
         function (error, results) {
+            if (error) {
+                return res
+                    .status(500)
+                    .json({ message: "서버 오류가 발생했습니다." });
+            }
             if (results.length != 0) {
                 res.status(200).json(results);
             } else {
@@ -42,6 +47,11 @@ router.post("/login", (req, res) => {
         `SELECT * FROM users WHERE users.email = ?`,
         [email],
         function (error, results) {
+            if (error) {
+                return res
+                    .status(500)
+                    .json({ message: "서버 오류가 발생했습니다." });
+            }
             if (results.length != 0) {
                 loginUser = results[0];
                 if (loginUser.password == password) {
@@ -74,6 +84,11 @@ router.post("/register", (req, res) => {
             `INSERT INTO users (email, name, password, contact) VALUES (?,?,?,?)`,
             [email, name, password, contact],
             function (err, results) {
+                if (error) {
+                    return res
+                        .status(500)
+                        .json({ message: "서버 오류가 발생했습니다." });
+                }
                 res.status(201).json(results);
             }
         );
@@ -87,6 +102,11 @@ router.delete("/users/", (req, res) => {
         `DELETE FROM users WHERE email = ?`,
         [email],
         function (err, results) {
+            if (error) {
+                return res
+                    .status(500)
+                    .json({ message: "서버 오류가 발생했습니다." });
+            }
             res.status(200).json(results);
         }
     );
