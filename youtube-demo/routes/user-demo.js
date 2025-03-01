@@ -81,8 +81,14 @@ router.post("/register", (req, res) => {
 
 // 회원 삭제 (DELETE /users/)
 router.delete("/users/", (req, res) => {
-    const { userId } = req.body;
-    const user = db.get(userId);
+    const { email } = req.body;
+    conn.query(
+        `DELETE FROM users WHERE email = ?`,
+        [email],
+        function (err, results) {
+            res.status(200).json(results);
+        }
+    );
 
     if (user) {
         const name = user.name;
