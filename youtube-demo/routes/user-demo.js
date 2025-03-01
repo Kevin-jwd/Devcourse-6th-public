@@ -35,30 +35,31 @@ router.get("/users", (req, res) => {
 
 // 로그인 (POST /login)
 router.post("/login", (req, res) => {
-    const { userId, userPw } = req.body;
+    const { email, password } = req.body;
     let loginUser = {};
 
-    db.forEach(function (user, id) {
-        if (user.userId === userId) {
-            loginUser = user;
+    conn.query(
+        `SELECT * FROM users WHERE users.email = ?`,
+        [email],
+        function (error, results) {
+            if (results.length != 0) {
+                loginUser = results[0];
+                if (loginUser.password == password) {
+                    res.status(200).json({
+                        message: `${loginUser.name}님 성공적으로 로그인되었습니다.`,
+                    });
+                } else {
+                    res.status(400).json({
+                        message: "비밀번호가 틀렸습니다.",
+                    });
+                }
+            } else {
+                res.status(404).json({
+                    message: "존재하지 않는 사용자입니다.",
+                });
+            }
         }
-    });
-
-    if (isExist(loginUser)) {
-        if (loginUser.userPw === userPw) {
-            res.status(200).json({
-                message: `${loginUser.name}님 성공적으로 로그인 되었습니다.`,
-            });
-        } else {
-            res.status(400).json({
-                message: "비밀번호가 틀렸습니다.",
-            });
-        }
-    } else {
-        res.status(404).json({
-            message: "존재하지 않는 ID입니다.",
-        });
-    }
+    );
 });
 
 // 회원가입 (POST /register)
@@ -102,14 +103,5 @@ router.delete("/users/", (req, res) => {
         });
     }
 });
-
-// 존재 여부 확인 함수
-function isExist(obj) {
-    if (Object.keys(obj).length) {
-        return true;
-    } else {
-        return false;
-    }
-}
 
 module.exports = router;
