@@ -91,32 +91,23 @@ router.post("/register", (req, res) => {
 });
 
 // 회원 삭제 (DELETE /users/)
-router.delete("/users/", (req, res) => {
+router.delete("/users", (req, res) => {
     const { email } = req.body;
-    conn.query(
-        `DELETE FROM users WHERE email = ?`,
-        [email],
-        function (error, results) {
-            if (error) {
-                return res
-                    .status(500)
-                    .json({ message: "서버 오류가 발생했습니다." });
-            }
-            return res.status(200).json(results);
-        }
-    );
 
-    if (user) {
-        const name = user.name;
-        db.delete(userId);
+    conn.query(`DELETE FROM users WHERE email = ?`, [email], (error, results) => {
+        if (error) {
+            return res.status(500).json({ message: "서버 오류가 발생했습니다." });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ message: "존재하지 않는 사용자입니다." });
+        }
+
         return res.status(200).json({
-            message: `${name}님 다시 만날 날을 기약하겠습니다.`,
+            message: "회원 정보 삭제가 완료되었습니다.",
         });
-    } else {
-        return res.status(404).json({
-            message: "존재하지 않는 사용자입니다.",
-        });
-    }
+    });
 });
+
 
 module.exports = router;
