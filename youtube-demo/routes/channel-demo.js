@@ -13,6 +13,17 @@ const conn = mysql.createConnection({
     database: "Youtube",
 });
 
+const validate = (req, res, next) => {
+    const err = validationResult(req);
+    if (!err.isEmpty()) {
+        return res.status(400).json({
+            message: "입력 값을 다시 한 번 확인해주세요.",
+            errors: err.array(),
+        });
+    }
+    next();
+};
+
 // Routes
 // path: "/channels"
 router
@@ -22,16 +33,9 @@ router
         body("user_id")
             .isInt()
             .withMessage("user_id는 필수이며 숫자여야 합니다."),
+        validate,
         (req, res) => {
-            const err = validationResult(req);
-            if (!err.isEmpty()) {
-                return res.status(400).json({
-                    message: "입력 값을 다시 한 번 확인해주세요.",
-                    err: err.array(),
-                });
-            }
-
-            let { user_id } = req.body;
+            const { user_id } = req.body;
 
             if (!user_id) {
                 return res.status(400).json({
@@ -70,17 +74,10 @@ router
                 .withMessage("name은 필수 입력값입니다.")
                 .matches(/^[a-zA-Z가-힣\s]+$/)
                 .withMessage("name은 한글, 영문자, 공백만 포함할 수 있습니다."),
+            validate,
         ],
         (req, res) => {
-            const err = validationResult(req);
             const { name, user_id } = req.body;
-
-            if (!err.isEmpty()) {
-                return res.status(400).json({
-                    message: "입력 값을 다시 한 번 확인해주세요.",
-                    err: err.array(),
-                });
-            }
 
             conn.query(
                 `INSERT INTO channels (name, user_id) VALUES (?, ?)`,
@@ -103,15 +100,11 @@ router
 
     // 개별 채널 조회 : GET /channels/:id
     .get(
-        param("id").notEmpty().withMessage("user_id는 필수 입력값입니다."),
+        [
+            param("id").notEmpty().withMessage("user_id는 필수 입력값입니다."),
+            validate,
+        ],
         (req, res) => {
-            const err = validationResult(req);
-            if (!err.isEmpty()) {
-                return res.status(400).json({
-                    message: "입력 값을 다시 한 번 확인해주세요.",
-                    err: err.array(),
-                });
-            }
             const channelId = parseInt(req.params.id);
             conn.query(
                 `SELECT * FROM channels WHERE id = ?`,
@@ -135,21 +128,16 @@ router
 
     // 채널(제목) 수정 : PUT /channels/:id
     .put(
-        param("id").isInt().withMessage("id는 필수이며 숫자여야 합니다"),
-        body("name")
-            .notEmpty()
-            .withMessage("name은 필수 입력값입니다.")
-            .matches(/^[a-zA-Z가-힣\s]+$/)
-            .withMessage("name은 한글, 영문자, 공백만 포함할 수 있습니다."),
+        [
+            param("id").isInt().withMessage("id는 필수이며 숫자여야 합니다"),
+            body("name")
+                .notEmpty()
+                .withMessage("name은 필수 입력값입니다.")
+                .matches(/^[a-zA-Z가-힣\s]+$/)
+                .withMessage("name은 한글, 영문자, 공백만 포함할 수 있습니다."),
+            validate,
+        ],
         (req, res) => {
-            const err = validationResult(req);
-            if (!err.isEmpty()) {
-                return res.status(400).json({
-                    message: "입력 값을 다시 한 번 확인해주세요.",
-                    err: err.array(),
-                });
-            }
-
             const newName = req.body.name;
             const id = parseInt(req.params.id);
             conn.query(
@@ -177,15 +165,11 @@ router
 
     // 개별 채널 삭제 : DELETE /channels/:id
     .delete(
-        param("id").isInt().withMessage("id는 필수이며 숫자여야 합니다"),
+        [
+            param("id").isInt().withMessage("id는 필수이며 숫자여야 합니다"),
+            validate,
+        ],
         (req, res) => {
-            const err = validationResult(req);
-            if (!err.isEmpty()) {
-                return res.status(400).json({
-                    message: "입력 값을 다시 한 번 확인해주세요.",
-                    err: err.array(),
-                });
-            }
             const id = parseInt(req.params.id);
             conn.query(
                 "DELETE FROM channels WHERE id = ?",
