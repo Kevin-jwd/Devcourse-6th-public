@@ -47,9 +47,16 @@ router
 
     // 채널 등록 : POST /channels
     .post(
-        body("user_id")
-            .isInt()
-            .withMessage("user_id는 필수이며 숫자여야 합니다."),
+        [
+            body("user_id")
+                .isInt()
+                .withMessage("user_id는 필수이며 숫자여야 합니다."),
+            body("name")
+                .notEmpty()
+                .withMessage("name은 필수 입력값입니다.")
+                .matches(/^[a-zA-Z가-힣\s]+$/)
+                .withMessage("name은 한글, 영문자, 공백만 포함할 수 있습니다."),
+        ],
         (req, res) => {
             const err = validationResult(req);
             const { name, user_id } = req.body;
