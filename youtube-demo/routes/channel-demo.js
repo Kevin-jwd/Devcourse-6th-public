@@ -1,7 +1,17 @@
 const express = require("express");
+const mysql = require("mysql2");
+const { body, validationResult } = require("express-validator");
 const router = express.Router();
 
 router.use(express.json());
+
+// 데이터베이스와 connection(conn) 생성
+const conn = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "root",
+    database: "Youtube",
+});
 
 // Routes
 // path: "/channels"
@@ -36,15 +46,21 @@ router
     })
 
     // 채널 등록 : POST /channels
-    .post((req, res) => {
-        const { name, user_id } = req.body;
+    .post(
+        body("user_id")
+            .isInt()
+            .withMessage("user_id는 필수이며 숫자여야 합니다."),
+        (req, res) => {
+            const err = validationResult(req);
+            const { name, user_id } = req.body;
 
-        if (Object.keys(req.body).length === 0) {
-            return res.status(400).json({
-                message: "입력 값을 다시 한 번 확인해주세요.",
-            });
-        } else {
-            const { name } = req.body;
+            if (!err.isEmpty()) {
+                return res.status(400).json({
+                    message: "입력 값을 다시 한 번 확인해주세요.",
+                    err: err.array(),
+                });
+            }
+
             conn.query(
                 `INSERT INTO channels (name, user_id) VALUES (?, ?)`,
                 [name, user_id],
@@ -58,7 +74,7 @@ router
                 }
             );
         }
-    });
+    );
 
 // path: "/channels/:id"
 router
