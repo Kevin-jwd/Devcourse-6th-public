@@ -3,58 +3,61 @@ const router = express.Router();
 
 router.use(express.json());
 
-// Declare Map object as database
-let db = new Map();
-
-// Declare id as auto increment
-let id = 1;
-
 // Routes
 // path: "/channels"
 router
     .route("/")
-
     // 전체 채널 조회 : GET /channels
     .get((req, res) => {
-        let { userId } = req.body;
-        let jsonObject = {};
-
-        if(userId == undefined) {
-            return res.status(404).json({
-                message: "로그인이 필요한 페이지입니다.",
+        let { user_id } = req.body;
+        if (!user_id) {
+            return res.status(400).json({
+                message: "id가 유효하지 않습니다.",
             });
         }
-
-        db.forEach((channel, key) => {
-            if (channel.userId === userId) {
-                jsonObject[key] = channel;
+        conn.query(
+            `SELECT * FROM channels WHERE user_id = ?`,
+            [user_id],
+            function (error, results) {
+                if (error) {
+                    return res
+                        .status(500)
+                        .json({ message: "서버 오류가 발생했습니다." });
+                }
+                if (results.length) {
+                    return res.status(200).json(results);
+                } else {
+                    return res.status(404).json({
+                        message: "채널이 존재하지 않습니다.",
+                    });
+                }
             }
-        });
-        
-        if (Object.keys(jsonObject).length === 0) {
-            return res.status(404).json({
-                message: "조회할 채널이 존재하지 않습니다.",
-            });
-        }
-
-        res.status(200).json(jsonObject); 
+        );
     })
 
     // 채널 등록 : POST /channels
     .post((req, res) => {
-        if (req.body.channelTitle) {
-            const channel = req.body;
-            db.set(id++, channel);
-            return res.status(201).json({
-                message: `${
-                    db.get(id - 1).channelTitle
-                } 채널이 성공적으로 생성되었습니다.`,
-            });
-        }
+        const { name, user_id } = req.body;
 
-        res.status(400).json({
-            message: "요청 값이 유효하지 않습니다.",
-        });
+        if (Object.keys(req.body).length === 0) {
+            return res.status(400).json({
+                message: "입력 값을 다시 한 번 확인해주세요.",
+            });
+        } else {
+            const { name } = req.body;
+            conn.query(
+                `INSERT INTO channels (name, user_id) VALUES (?, ?)`,
+                [name, user_id],
+                function (error, results) {
+                    if (error) {
+                        return res
+                            .status(500)
+                            .json({ message: "서버 오류가 발생했습니다." });
+                    }
+                    return res.status(201).json(results);
+                }
+            );
+        }
     });
 
 // path: "/channels/:id"
