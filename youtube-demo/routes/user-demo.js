@@ -1,9 +1,15 @@
 const express = require("express");
-const mysql = require("mysql2");
-const { body, param, validationResult } = require("express-validator");
 const router = express.Router();
-
 router.use(express.json());
+
+const mysql = require("mysql2");
+
+const { body, param, validationResult } = require("express-validator");
+
+const jwt = require("jsonwebtoken");
+
+const dotenv = require("dotenv");
+dotenv.config();
 
 // 데이터베이스와 connection(conn) 생성
 const conn = mysql.createConnection({
@@ -122,7 +128,28 @@ router.post(
                         .status(500)
                         .json({ message: "서버 오류가 발생했습니다." });
                 }
+
+                let loginUser = results[0];
+
                 if (results.length !== 0 && results[0].password === password) {
+                    const token = jwt.sign(
+                        {
+                            email: loginUser.email,
+                            name: loginUser.name,
+                        },
+                        process.env.PRIVATE_KEY,
+                        {
+                            expiresIn: "30m",
+                            issuer: "Do",
+                        }
+                    );
+                    console.log(token)
+                    res.cookie("token", token, {
+                        httpOnly: true,
+                        secure: true,
+                        maxAge: 1000 * 60 * 60 * 24,
+                    });
+
                     return res.status(200).json({
                         message: `${results[0].name}님 성공적으로 로그인되었습니다.`,
                     });
@@ -131,7 +158,7 @@ router.post(
                         message: "존재하지 않는 사용자입니다.",
                     });
                 } else {
-                    return res.status(400).json({
+                    return res.status(401).json({
                         message: "비밀번호가 틀렸습니다.",
                     });
                 }
