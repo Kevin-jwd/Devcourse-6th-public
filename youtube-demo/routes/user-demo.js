@@ -139,17 +139,17 @@ router.post(
                         },
                         process.env.PRIVATE_KEY
                     );
+                    res.cookie("token", token);
 
                     return res.status(200).json({
                         message: `${results[0].name}님 성공적으로 로그인되었습니다.`,
-                        token: token,
                     });
                 } else if (results.length === 0) {
                     return res.status(404).json({
                         message: "존재하지 않는 사용자입니다.",
                     });
                 } else {
-                    return res.status(400).json({
+                    return res.status(401).json({
                         message: "비밀번호가 틀렸습니다.",
                     });
                 }
