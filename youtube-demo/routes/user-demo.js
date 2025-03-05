@@ -137,11 +137,16 @@ router.post(
                             email: loginUser.email,
                             name: loginUser.name,
                         },
-                        process.env.PRIVATE_KEY
+                        process.env.PRIVATE_KEY,
+                        {
+                            expiresIn: "30m",
+                            issuer: "Do",
+                        }
                     );
+                    console.log(token)
                     res.cookie("token", token, {
-                        httpOnly : true,
-                        secure:true,
+                        httpOnly: true,
+                        secure: true,
                         maxAge: 1000 * 60 * 60 * 24,
                     });
 
