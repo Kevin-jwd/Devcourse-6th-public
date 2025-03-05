@@ -139,7 +139,11 @@ router.post(
                         },
                         process.env.PRIVATE_KEY
                     );
-                    res.cookie("token", token);
+                    res.cookie("token", token, {
+                        httpOnly : true,
+                        secure:true,
+                        maxAge: 1000 * 60 * 60 * 24,
+                    });
 
                     return res.status(200).json({
                         message: `${results[0].name}님 성공적으로 로그인되었습니다.`,
