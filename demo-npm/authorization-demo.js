@@ -22,7 +22,7 @@ app.get("/jwt", function (req, res) {
 
 // GET + "/jwt/decoded" : 토큰 검증
 app.get("/jwt/decoded", function (req, res) {
-    req.cookies
-    let decoded = jwt.verify(token, process.env.PRIVATE_KEY);
+    let received_jwt = req.headers["authorization"];
+    let decoded = jwt.verify(received_jwt, process.env.PRIVATE_KEY);
     res.send(decoded);
 });
